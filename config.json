@@ -1,0 +1,12 @@
+﻿{
+    "databaseConnection":
+    {
+      "host": "localhost",
+      "user": "root",
+      "password": "123456",
+      "database": "chatAngular",
+      "charset" : "utf8"
+    },
+    "apiUrl": "http://localhost:4000/api",
+    "secret": "chatPractica"
+}
