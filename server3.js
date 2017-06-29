@@ -1,15 +1,50 @@
-var http = require('http');
-var express = require("express");
-
+var express =require('express');
 var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var ss = require('socket.io-stream');
+var fs = require('fs');
+var broadcaster=null;
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', (process.env.PORT || 3000));
 
-app.get('/', function(request, response) {
-  console.log('[support dash] processing get request')
-  response.send('Hello World 2!');
+app.use(express.static('public'))
+
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/public/index.html');
 });
 
-app.listen(process.env.PORT, function () {
-  console.log('***** exp listening on port: ' + process.env.PORT);
+io.sockets.on('connection', function(socket) {
+
+    if(broadcaster==null){
+      broadcaster=socket.id;
+      socket.broadcast.emit("broadcastJoin",socket.id);
+    }else{
+      io.to(broadcaster).emit('clientJoin', socket.id);
+    }
+
+    console.log((new Date()) + ' Connection established.');
+
+
+    socket.on('message', function(toId, message) {
+        io.to(toId).emit('message', socket.id, message);
+    });
+
+    socket.on('disconnect', function() {
+      if(socket.id==broadcaster){
+        broadcaster=null;
+        socket.broadcast.emit("broadcastLeft",socket.id);
+        console.log((new Date()) + "broadcaster disconnected.");
+      }else{
+        socket.broadcast.emit("clientLeft",socket.id);
+        console.log((new Date()) + "client disconnected.");
+      }
+
+
+    });
+
+});
+
+http.listen((process.env.PORT || 3000), function () {
+  console.log('***** exp listening on port: ' + (process.env.PORT || 3000));
 });
