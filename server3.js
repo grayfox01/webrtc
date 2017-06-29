@@ -1,3 +1,4 @@
+var sslRedirect = require('heroku-ssl-redirect');
 var express =require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -6,7 +7,7 @@ var ss = require('socket.io-stream');
 var fs = require('fs');
 var broadcaster=null;
 
-http.listen(5000);
+app.use(sslRedirect());
 
 app.use(express.static('public'))
 
@@ -43,4 +44,8 @@ io.sockets.on('connection', function(socket) {
 
     });
 
+});
+
+http.listen(3000, function(){
+  console.log('listening on *:3000');
 });
