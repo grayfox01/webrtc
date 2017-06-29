@@ -6,6 +6,8 @@ var ss = require('socket.io-stream');
 var fs = require('fs');
 var broadcaster=null;
 
+http.listen(5000);
+
 app.use(express.static('public'))
 
 app.get('/', function(req, res){
@@ -41,8 +43,4 @@ io.sockets.on('connection', function(socket) {
 
     });
 
-});
-
-http.listen(5000, function(){
-  console.log('listening on *:3000');
 });
