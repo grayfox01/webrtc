@@ -56,6 +56,7 @@
 console.log(supportedConstraints);
     navigator.mediaDevices.getUserMedia(screen_constraints).then(stream => {
       // we have a stream, attach it to a feedback video element
+      localStream=stream;
       sourcevid.srcObject = stream;
       socket = io.connect(window.location.hostname);
       socket.on('clientJoin', clientJoin).on('clientLeft', clientLeft).on('message', onMessage);
