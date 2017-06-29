@@ -32,7 +32,8 @@
   <script src="../libs/socket.io.js"></script>
   <script src="../libs/socket.io-stream.js"></script>
   <script>
-    var socket;
+    var socket = io.connect(window.location.hostname);
+    socket.on('clientJoin', clientJoin).on('clientLeft', clientLeft).on('message', onMessage);
     var socketid;
     var sourcevid = document.getElementById('sourcevid');
 
