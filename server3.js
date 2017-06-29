@@ -1,51 +1,25 @@
-var sslRedirect = require('heroku-ssl-redirect');
-var express =require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var ss = require('socket.io-stream');
+var http = require('http');
+var https = require('https');
 var fs = require('fs');
-var broadcaster=null;
+var express = require("express");
 
-app.use(sslRedirect());
+var app = express();
 
-app.use(express.static('public'))
+app.set('port', process.env.PORT || 3000);
+app.use(express.logger());
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/public/index.html');
+app.get('/', function(request, response) {
+  response.send('Hello World 2!');
 });
 
-io.sockets.on('connection', function(socket) {
+var privateKey = fs.readFileSync(__dirname + '/ssl/server.key').toString();
+var certificate = fs.readFileSync(__dirname + '/ssl/gandiSSL.pem').toString();
 
-    if(broadcaster==null){
-      broadcaster=socket.id;
-      socket.broadcast.emit("broadcastJoin",socket.id);
-    }else{
-      io.to(broadcaster).emit('clientJoin', socket.id);
-    }
+var options = {
+  key: privateKey,
+  cert: certificate
+};
 
-    console.log((new Date()) + ' Connection established.');
-
-
-    socket.on('message', function(toId, message) {
-        io.to(toId).emit('message', socket.id, message);
-    });
-
-    socket.on('disconnect', function() {
-      if(socket.id==broadcaster){
-        broadcaster=null;
-        socket.broadcast.emit("broadcastLeft",socket.id);
-        console.log((new Date()) + "broadcaster disconnected.");
-      }else{
-        socket.broadcast.emit("clientLeft",socket.id);
-        console.log((new Date()) + "client disconnected.");
-      }
-
-
-    });
-
-});
-
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+https.createServer(options, app).listen(process.env.PORT, function () {
+  console.log("Express server listening on port " + app.get('port'));
 });
