@@ -32,8 +32,7 @@
   <script src="../libs/socket.io.js"></script>
   <script src="../libs/socket.io-stream.js"></script>
   <script>
-    var socket = io.connect(window.location.hostname);
-    socket.on('clientJoin', clientJoin).on('clientLeft', clientLeft).on('message', onMessage);
+    var socket;
     var socketid;
     var sourcevid = document.getElementById('sourcevid');
 
@@ -58,6 +57,8 @@ console.log(supportedConstraints);
     navigator.mediaDevices.getUserMedia(screen_constraints).then(stream => {
       // we have a stream, attach it to a feedback video element
       sourcevid.srcObject = stream;
+      socket = io.connect(window.location.hostname);
+      socket.on('clientJoin', clientJoin).on('clientLeft', clientLeft).on('message', onMessage);
     }, error => {
       console.log("Unable to acquire screen capture", error);
     });
