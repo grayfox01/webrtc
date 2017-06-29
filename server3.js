@@ -19,12 +19,11 @@ io.sockets.on('connection', function(socket) {
     if(broadcaster==null){
       broadcaster=socket.id;
       socket.broadcast.emit("broadcastJoin",socket.id);
+      console.log((new Date()) + 'broadcaster conected.');
     }else{
       io.to(broadcaster).emit('clientJoin', socket.id);
+      console.log((new Date()) + 'client conected.');
     }
-
-    console.log((new Date()) + ' Connection established.');
-
 
     socket.on('message', function(toId, message) {
         io.to(toId).emit('message', socket.id, message);
