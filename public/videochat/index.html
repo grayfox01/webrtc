@@ -17,7 +17,7 @@
   <script src="./socket.io-stream.js"></script>
   <script>
   // create socket
-  var socket = io.connect('192.168.1.21:3000/');
+  var socket = io.connect(window.location.protocol+'//'+window.location.hostname+((window.location.port)?':'+window.location.port:''));
 
   var sourcevid = document.getElementById('webrtc-sourcevid');
   var remotevid = document.getElementById('webrtc-remotevid');
