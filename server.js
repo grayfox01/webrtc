@@ -4,30 +4,46 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ss = require('socket.io-stream');
 var fs = require('fs');
+var broadcaster=null;
+
+app.set('port', (process.env.PORT || 3000));
 
 app.use(express.static('public'))
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/public/index.html');
 });
 
 io.sockets.on('connection', function(socket) {
-  console.log((new Date()) + ' Connection established.');
-      // When a user send a SDP message
-      // broadcast to all users in the room
-      socket.on('message', function(message) {
-          console.log((new Date()) + ' Received Message, broadcasting: ' + message);
-          socket.broadcast.emit('message', message);
-      });
-      // When the user hangs up
-      // broadcast bye signal to all users in the room
-      socket.on('disconnect', function() {
-          // close user connection
-          console.log((new Date()) + " Peer disconnected.");
-          socket.broadcast.emit('user disconnected');
-      });
+
+    if(broadcaster==null){
+      broadcaster=socket.id;
+      socket.broadcast.emit("broadcastJoin",socket.id);
+      console.log((new Date()) + 'broadcaster conected.');
+    }else{
+      io.to(broadcaster).emit('clientJoin', socket.id);
+      console.log((new Date()) + 'client conected.');
+    }
+
+    socket.on('message', function(toId, message) {
+        io.to(toId).emit('message', socket.id, message);
+    });
+
+    socket.on('disconnect', function() {
+      if(socket.id==broadcaster){
+        broadcaster=null;
+        socket.broadcast.emit("broadcastLeft",socket.id);
+        console.log((new Date()) + "broadcaster disconnected.");
+      }else{
+        socket.broadcast.emit("clientLeft",socket.id);
+        console.log((new Date()) + "client disconnected.");
+      }
+
+
+    });
+
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+http.listen((process.env.PORT || 3000), function () {
+  console.log('***** exp listening on port: ' + (process.env.PORT || 3000));
 });

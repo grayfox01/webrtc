@@ -59,7 +59,7 @@ console.log(supportedConstraints);
       // we have a stream, attach it to a feedback video element
       localStream=stream;
       sourcevid.srcObject = stream;
-      socket = io.connect(window.location.hostname);
+      socket = io.connect(window.location.protocol+'//'+window.location.hostname+((window.location.port)?':'+window.location.port:''));
       socket.on('clientJoin', clientJoin).on('clientLeft', clientLeft).on('message', onMessage);
     }, error => {
       console.log("Unable to acquire screen capture", error);
