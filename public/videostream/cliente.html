@@ -31,7 +31,7 @@
   <script src="../libs/socket.io.js"></script>
   <script src="../libs/socket.io-stream.js"></script>
   <script>
-    var socket = io.connect(window.location.protocol+'//'+window.location.hostname+((window.location.port)?':'+window.location.port:''));
+    var socket = io.connect(window.location.protocol+'//'+window.location.hostname+((window.location.port)?':'+window.location.port:""));
     socket.on('broadcastJoin', broadcastJoin).on('broadcastLeft', broadcastLeft).on('message', onMessage);
     var socketid;
     var remotevid = document.getElementById('remotevid');
